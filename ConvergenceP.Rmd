@@ -1,0 +1,57 @@
+---
+title: "ConvergenceP"
+author: "Iván Pacheco Soto"
+date: "August 22, 2014"
+output: ioslides_presentation
+---
+
+## Convergence in Probability
+
+The __ConvergenceP__ shiny application ilustrates the convergence in probability of the sample mean to its true value for three distribution functions: normal, exponential and lognormal distributions.
+
+The sample mean $\overline{X}$ converges in probability to $\mu$ if
+$$
+\lim_{n \to \infty} P(|\overline{X}-\mu| < \epsilon) = 0.
+$$
+
+To illustrate this convergence the shinyapp controls the sample size $n$, the radius of the neighborhood $\epsilon$, the number of simulation and the distribution of the population. Furthermore, to ilustrate how the averages approches the true value, a cumulative average of the sample is plotted.
+
+## Parameters of the simulation
+
+1. **Probability density function.** To make a fair comparison the three distributions selected have the same mean and standard deviation.
+
+```{r echo=FALSE}
+library(ggplot2)
+
+x0 <- seq(-20, 40, by=.1) 
+fx <- c(dnorm(x0, mean=10, sd=10), dexp(x0, rate=1/10), 
+            dlnorm(x0, meanlog=log(5*sqrt(2))) )
+x <- rep(x0, 3)
+pdfs <- data.frame(Distribution=gl(3,length(x0), 
+                    labels=c("Normal","Exponential","Lognormal")), 
+                    x=x, fx=fx)
+g <- ggplot(pdfs, aes(x, fx, colour=Distribution, group=Distribution))
+g + geom_line() + labs(y="f(x)")
+```
+
+## Parameters of the simulation (cont.)
+
+2. **Sample size $n$.** Increase or decrease the sample size to visualize how the lines get closer to the horizontal line at 10.
+3. **Number of simulation $N$.** When you increase the value you will get more lines in the plot. Most of them should get closer to the horizontal line at 10.
+4. **Error size $\epsilon$.** When you decrease this value, more line should turn in red, because it would be less likely to get closer to the horizontal line at 10. 
+
+## Simulated limit
+
+The limit tab of the ConvergenceP shinyapp shows the final mean for each simulated simulation. For example if we simulate 5 series of length $n = 1000$, the output would be.
+
+```{r}
+
+tseries <- ts(apply(matrix(rnorm(1000*5, mean=10, sd=10), 
+                nrow = 1000, ncol = 5), 2,cumsum)/seq(1,1000))
+table <- as.data.frame(tseries[1000,])
+names(table) <- ""
+print(table)
+
+```
+
+
